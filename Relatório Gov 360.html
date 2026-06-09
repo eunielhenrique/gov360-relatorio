@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elviz Cezar — Relatório de Campanhas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #f1f5fb;
+      --surface: #ffffff;
+      --primary: #1d6af5;
+      --plight:  #e8f0fe;
+      --text:    #0c1830;
+      --t2:      #4a5d78;
+      --t3:      #96a8bb;
+      --border:  #e2eaf4;
+      --r:       14px;
+      --shadow:  0 1px 3px rgba(12,24,60,.04), 0 4px 20px rgba(12,24,60,.07);
+      --green:   #15803d; --gbg: #dcfce7;
+      --orange:  #c2410c; --obg: #ffedd5;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background: var(--bg); color: var(--text);
+      -webkit-font-smoothing: antialiased; line-height: 1.5;
+    }
+
+    /* ─── HEADER ─────────────────────────────── */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      height: 58px; display: flex; align-items: center;
+      padding: 0 40px; gap: 14px;
+    }
+    .hd-brand {
+      display: flex; align-items: center; gap: 9px;
+      font-weight: 800; font-size: 16px; letter-spacing: -.4px;
+    }
+    .hd-icon {
+      width: 28px; height: 28px; border-radius: 7px;
+      background: var(--primary); color: #fff;
+      font-size: 11px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .hd-sep { width: 1px; height: 18px; background: var(--border); }
+    .hd-sub { font-size: 14px; font-weight: 500; color: var(--t2); }
+    .hd-space { flex: 1; }
+    .pill {
+      padding: 4px 11px; border-radius: 999px;
+      font-size: 12px; font-weight: 600; white-space: nowrap;
+    }
+    .pill-blue { background: var(--plight); color: var(--primary); }
+    .pill-gray { background: var(--bg); color: var(--t2); border: 1px solid var(--border); }
+
+    /* ─── WRAPPER ────────────────────────────── */
+    .wrap { max-width: 1300px; margin: 0 auto; padding: 28px 40px 72px; }
+
+    /* ─── SECTION HEADER ─────────────────────── */
+    .sh { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .sh-lbl {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .08em; color: var(--t3); white-space: nowrap;
+    }
+    .sh-line { flex: 1; height: 1px; background: var(--border); }
+
+    /* ─── KPI GRID ───────────────────────────── */
+    .kpi-grid {
+      display: grid; grid-template-columns: repeat(6, 1fr);
+      gap: 12px; margin-bottom: 28px;
+    }
+    .kpi {
+      background: var(--surface); border-radius: var(--r);
+      padding: 18px 20px; box-shadow: var(--shadow);
+    }
+    .kpi-lbl {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--t3); margin-bottom: 8px;
+    }
+    .kpi-val {
+      font-size: 26px; font-weight: 800; letter-spacing: -1.5px;
+      line-height: 1; color: var(--text);
+    }
+    .kpi-val.blue { color: var(--primary); }
+    .kpi-hint { font-size: 11.5px; color: var(--t3); margin-top: 5px; }
+
+    /* ─── WEEKLY TREND ───────────────────────── */
+    .week-grid {
+      display: grid; grid-template-columns: repeat(5, 1fr);
+      gap: 12px; margin-bottom: 20px;
+    }
+    .week-card {
+      background: var(--surface); border-radius: var(--r);
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .week-card-top {
+      padding: 14px 18px 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+    }
+    .week-card-num {
+      font-size: 13px; font-weight: 800; color: var(--text);
+    }
+    .week-card-range {
+      font-size: 12px; color: var(--t3); font-weight: 500;
+    }
+    .week-delta {
+      margin-left: auto; font-size: 11px; font-weight: 700;
+      padding: 2px 6px; border-radius: 4px;
+    }
+    .up   { background: #dcfce7; color: #15803d; }
+    .down { background: #ffedd5; color: #c2410c; }
+    .week-card-body { padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+    .week-stat { display: flex; align-items: center; gap: 8px; }
+    .week-stat-lbl { font-size: 12px; color: var(--t2); flex: 1; }
+    .week-stat-val { font-size: 14px; font-weight: 700; color: var(--text); }
+    .week-bar-track {
+      width: 48px; height: 5px; background: var(--border);
+      border-radius: 3px; overflow: hidden;
+    }
+    .week-bar-fill { height: 100%; border-radius: 3px; background: var(--primary); }
+
+    /* ─── CARD ───────────────────────────────── */
+    .card {
+      background: var(--surface); border-radius: var(--r);
+      box-shadow: var(--shadow); padding: 24px;
+    }
+    .card-title {
+      font-size: 14px; font-weight: 700;
+      color: var(--text); margin-bottom: 18px;
+    }
+    .mb { margin-bottom: 20px; }
+
+    /* ─── ADS TABLE ──────────────────────────── */
+    .ads-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .ads-scroll-hint {
+      display: none; font-size: 11px; color: var(--t3);
+      text-align: center; padding: 6px 0 2px; letter-spacing: .02em;
+    }
+    .ads-tbl { width: 100%; border-collapse: collapse; min-width: 680px; }
+    .ads-tbl th {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--t3);
+      padding: 0 16px 11px 0; text-align: left;
+      border-bottom: 1.5px solid var(--border);
+    }
+    .ads-tbl th:first-child, .ads-tbl td:first-child { padding-left: 0; }
+    .ads-tbl th.r, .ads-tbl td.r { text-align: right; }
+    .ads-tbl td {
+      padding: 13px 16px 13px 0; border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .ads-tbl tr:last-child td { border-bottom: none; }
+    .ad-nm {
+      font-size: 13px; font-weight: 600; line-height: 1.35;
+      max-width: 220px; color: var(--text);
+    }
+    .tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 7px; border-radius: 5px;
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .04em;
+    }
+    .tag-on  { background: var(--gbg); color: var(--green); }
+    .tag-off { background: var(--obg); color: var(--orange); }
+    .bar-wrap { width: 160px; }
+    .bar-num  { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .bar-bg   { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .bar-fg   { height: 100%; border-radius: 3px; background: var(--primary); }
+    .n { font-size: 14px; font-weight: 700; color: var(--text); }
+
+    /* ─── GRIDS ──────────────────────────────── */
+    .g2 { display: grid; grid-template-columns: 1fr 1fr;       gap: 16px; }
+    .g3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+
+    /* ─── HORIZONTAL BAR LIST ────────────────── */
+    .hbl { display: flex; flex-direction: column; gap: 10px; }
+    .hbl-row {
+      display: grid; grid-template-columns: 52px 1fr 56px;
+      align-items: center; gap: 8px;
+    }
+    .hbl-lbl   { font-size: 12.5px; font-weight: 500; color: var(--t2); }
+    .hbl-track { height: 7px; background: var(--border); border-radius: 3.5px; overflow: hidden; }
+    .hbl-fill  { height: 100%; border-radius: 3.5px; background: var(--primary); }
+    .hbl-val   { font-size: 12px; font-weight: 700; color: var(--t2); text-align: right; }
+
+    /* ─── GENDER ─────────────────────────────── */
+    .gen-boxes {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px; margin-bottom: 20px;
+    }
+    .gen-box { border-radius: 12px; padding: 16px; text-align: center; }
+    .gen-box.f { background: #fce7f3; }
+    .gen-box.m { background: #eff6ff; }
+    .gen-pct { font-size: 24px; font-weight: 800; letter-spacing: -1px; line-height: 1; }
+    .gen-box.f .gen-pct { color: #9d174d; }
+    .gen-box.m .gen-pct { color: #1e40af; }
+    .gen-nm { font-size: 12px; font-weight: 600; color: var(--t2); margin-top: 4px; }
+    .gen-ct { font-size: 11px; color: var(--t3); }
+    .gen-sub { font-size: 12px; font-weight: 600; color: var(--t2); margin-bottom: 10px; }
+
+    /* ─── PLACEMENT ──────────────────────────── */
+    .plc {
+      background: var(--surface); border-radius: var(--r);
+      padding: 22px; box-shadow: var(--shadow);
+    }
+    .plc-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .plc-name { font-size: 14px; font-weight: 700; color: var(--text); }
+    .plc-badge {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .04em; padding: 2px 7px; border-radius: 4px;
+      background: var(--plight); color: var(--primary);
+    }
+    .plc-row {
+      display: flex; justify-content: space-between;
+      font-size: 13px; padding: 6px 0; border-bottom: 1px solid var(--border);
+    }
+    .plc-row:last-of-type { border-bottom: none; }
+    .plc-k { color: var(--t2); }
+    .plc-v { font-weight: 700; }
+    .plc-share { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+    .plc-share-lbl {
+      font-size: 11px; font-weight: 600; color: var(--t3);
+      text-transform: uppercase; letter-spacing: .04em; margin-bottom: 5px;
+    }
+    .plc-bar-bg  { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .plc-bar-fg  { height: 100%; border-radius: 3px; background: var(--primary); }
+
+    /* ─── RETENTION ──────────────────────────── */
+    .ret-grid {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 24px 28px;
+    }
+    .ret-nm { font-size: 12px; font-weight: 600; color: var(--t2); margin-bottom: 8px; }
+    .ret-trio { display: flex; flex-direction: column; gap: 3px; }
+    .ret-row { display: flex; align-items: center; gap: 7px; }
+    .ret-lbl {
+      font-size: 10px; font-weight: 700; color: var(--t3); width: 22px; flex-shrink: 0;
+    }
+    .ret-track {
+      flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden;
+    }
+    .ret-fill { height: 100%; border-radius: 4px; }
+    .r25 { background: #1d6af5; }
+    .r50 { background: #74b0fa; }
+    .r75 { background: #c5d9fd; }
+    .ret-ct {
+      font-size: 11px; font-weight: 700; color: var(--t2);
+      width: 40px; text-align: right; flex-shrink: 0;
+    }
+    .ret-legend {
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+      margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border);
+    }
+    .ret-leg-title {
+      font-size: 11px; font-weight: 700; color: var(--t3);
+      text-transform: uppercase; letter-spacing: .04em;
+    }
+    .ret-leg-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--t2); }
+    .ret-leg-dot { width: 12px; height: 7px; border-radius: 3px; flex-shrink: 0; }
+    .ret-leg-note { flex: 1; text-align: right; font-size: 11px; color: var(--t3); }
+
+    /* ─── FOOTER ─────────────────────────────── */
+    footer {
+      text-align: center; padding: 20px 40px;
+      font-size: 12px; color: var(--t3);
+    }
+
+    /* ══════════════════════════════════════════
+       MOBILE RESPONSIVE
+    ══════════════════════════════════════════ */
+    @media (max-width: 1024px) {
+      .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      header { padding: 0 20px; gap: 10px; }
+      .hd-sub { display: none; }
+      .hd-sep { display: none; }
+      .wrap { padding: 20px 16px 56px; }
+
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+      .kpi { padding: 14px 16px; }
+      .kpi-val { font-size: 22px; letter-spacing: -1px; }
+      .kpi-hint { font-size: 11px; }
+
+      .week-grid { overflow-x: auto; grid-template-columns: repeat(5, 180px); gap: 10px; padding-bottom: 4px; }
+
+      .g2 { grid-template-columns: 1fr; }
+      .g3 { grid-template-columns: 1fr; }
+
+      .ads-scroll-hint { display: block; }
+      .ads-tbl { min-width: 680px; }
+
+      .ret-grid { grid-template-columns: 1fr 1fr; gap: 16px 20px; }
+
+      .plc-head { flex-wrap: wrap; gap: 6px; }
+
+      .ret-legend { gap: 8px; }
+      .ret-leg-note { display: none; }
+    }
+
+    @media (max-width: 480px) {
+      header { height: 52px; }
+      .hd-brand { font-size: 15px; }
+      .pill-gray { display: none; }
+      .wrap { padding: 16px 12px 48px; }
+
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .kpi { padding: 12px 14px; }
+      .kpi-val { font-size: 20px; }
+      .kpi-lbl { font-size: 10px; }
+
+      .ret-grid { grid-template-columns: 1fr; }
+
+      .card { padding: 16px; }
+      .card-title { font-size: 13px; margin-bottom: 14px; }
+
+      .sh-lbl { font-size: 10px; }
+
+      .gen-pct { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="hd-brand">
+    Elviz Cezar
+  </div>
+  <div class="hd-sep"></div>
+  <span class="hd-sub">Prefeito de Santana de Parnaíba</span>
+  <div class="hd-space"></div>
+  <span class="pill pill-blue">Últimos 30 dias</span>
+  <span class="pill pill-gray">Meta Ads · 6 anúncios</span>
+</header>
+
+<div class="wrap">
+
+  <!-- ── VISÃO GERAL ─────────────────────────── -->
+  <div class="sh"><span class="sh-lbl">Visão Geral · Últimos 30 dias</span><div class="sh-line"></div></div>
+  <div class="kpi-grid mb">
+    <div class="kpi">
+      <div class="kpi-lbl">Alcance Total</div>
+      <div class="kpi-val">168.420</div>
+      <div class="kpi-hint">pessoas únicas</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl">Impressões</div>
+      <div class="kpi-val">199.970</div>
+      <div class="kpi-hint">freq. média 1,19×</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl">Interações</div>
+      <div class="kpi-val">63.890</div>
+      <div class="kpi-hint">engajamentos totais</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl">Investimento</div>
+      <div class="kpi-val blue">R$ 1.045</div>
+      <div class="kpi-hint">R$ 0,016 / interação</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl">Retenção 75%</div>
+      <div class="kpi-val">5.660</div>
+      <div class="kpi-hint">views ≥ 75% do vídeo</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl">Novos Seguidores</div>
+      <div class="kpi-val">45</div>
+      <div class="kpi-hint">ganhos no Instagram</div>
+    </div>
+  </div>
+
+  <!-- ── TENDÊNCIA SEMANAL ──────────────────── -->
+  <div class="sh"><span class="sh-lbl">Tendência Semanal</span><div class="sh-line"></div></div>
+  <div class="week-grid mb">
+
+    <!-- Semana 1 -->
+    <div class="week-card">
+      <div class="week-card-top">
+        <span class="week-card-num">Semana 1</span>
+        <span class="week-card-range">01–09 jun</span>
+      </div>
+      <div class="week-card-body">
+        <div class="week-stat"><span class="week-stat-lbl">Alcance</span><div class="week-bar-track"><div class="week-bar-fill" style="width:95.7%"></div></div><span class="week-stat-val">33.684</span></div>
+        <div class="week-stat"><span class="week-stat-lbl">Interações</span><div class="week-bar-track"><div class="week-bar-fill" style="width:96.5%"></div></div><span class="week-stat-val">12.778</span></div>
+        <div class="week-stat"><span class="week-stat-lbl">Investimento</span><div class="week-bar-track"><div class="week-bar-fill" style="width:98.6%"></div></div><span class="week-stat-val">R$ 209</span></div>
+      </div>
+    </div>
+
+    <!-- Semana 2 -->
+    <div class="week-card">
+      <div class="week-card-top" style="background:#f8faff">
+        <span class="week-card-num">Semana 2</span>
+        <span class="week-card-range">10–18 jun</span>
+        <span class="week-delta up">↑ +4,6%</span>
+      </div>
+      <div class="week-card-body">
+        <div class="week-stat"><span class="week-stat-lbl">Alcance</span><div class="week-bar-track"><div class="week-bar-fill" style="width:100%"></div></div><span class="week-stat-val" style="color:var(--primary)">35.210</span></div>
+        <div class="week-stat"><span class="week-stat-lbl">Interações</span><div class="week-bar-track"><div class="week-bar-fill" style="width:100%"></div></div><span class="week-stat-val" style="color:var(--primary)">13.245</span></div>
+        <div class="week-stat"><span class="week-stat-lbl">Investimento</span><div class="week-bar-track"><div class="week-bar-fill" style="width:100%"></div></div><span class="week-stat-val" style="color:var(--primary)">R$ 212</span></div>
+      </div>
+    </div>
+
+    <!-- Semana 3 -->
+    <div class="week-card">
+      <div class="week-card-top">
+        <span class="week-card-num">Semana 3</span>
+        <span class="week-card-range">19–27 jun</span>
+        <span class="week-delta down">↓ −8,7%</span>
+      </div>
+      <div class="week-card-body">
+        <div class="week-stat"><span class="week-stat-lbl">Alcance</span><div class="week-bar-track"><div class="week-bar-fill" style="width:91.3%"></div></div><span class="week-stat-val">32.158</span></div>
+        <div class="week-stat"><span class="week-stat-lbl">Interações</span><div class="week-bar-track"><div class="week-bar-fill" style="width:93.0%"></div></div><span class="week-stat-val">12.311</span></div>
+        <div class="week-stat"><span class="week-stat-lbl">Investimento</span><div class="week-bar-track"><div class="week-bar-fill" style="width:97.2%"></div></div><span class="week-stat-val">R$ 206</span></div>
+      </div>
+    </div>
+
+    <!-- Semana 4 -->
+    <div class="week-card">
+      <div class="week-card-top">
+        <span class="week-card-num">Semana 4</span>
+        <span class="week-card-range">28 jun–6 jul</span>
+        <span class="week-delta up">↑ +7,3%</span>
+      </div>
+      <div class="week-card-body">
+        <div class="week-stat"><span class="week-stat-lbl">Alcance</span><div class="week-bar-track"><div class="week-bar-fill" style="width:98.0%"></div></div><span class="week-stat-val">34.500</span></div>
+        <div class="week-stat"><span class="week-stat-lbl">Interações</span><div class="week-bar-track"><div class="week-bar-fill" style="width:99.0%"></div></div><span class="week-stat-val">13.100</span></div>
+        <div class="week-stat"><span class="week-stat-lbl">Investimento</span><div class="week-bar-track"><div class="week-bar-fill" style="width:99.1%"></div></div><span class="week-stat-val">R$ 210</span></div>
+      </div>
+    </div>
+
+    <!-- Semana 5 -->
+    <div class="week-card">
+      <div class="week-card-top">
+        <span class="week-card-num">Semana 5</span>
+        <span class="week-card-range">7–15 jul</span>
+        <span class="week-delta down">↓ −4,7%</span>
+      </div>
+      <div class="week-card-body">
+        <div class="week-stat"><span class="week-stat-lbl">Alcance</span><div class="week-bar-track"><div class="week-bar-fill" style="width:93.3%"></div></div><span class="week-stat-val">32.868</span></div>
+        <div class="week-stat"><span class="week-stat-lbl">Interações</span><div class="week-bar-track"><div class="week-bar-fill" style="width:94.1%"></div></div><span class="week-stat-val">12.456</span></div>
+        <div class="week-stat"><span class="week-stat-lbl">Investimento</span><div class="week-bar-track"><div class="week-bar-fill" style="width:98.1%"></div></div><span class="week-stat-val">R$ 208</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── ANÚNCIOS ───────────────────────────── -->
+  <div class="sh"><span class="sh-lbl">Performance por Anúncio</span><div class="sh-line"></div></div>
+  <div class="card mb">
+    <span class="ads-scroll-hint">← deslize para ver mais →</span>
+    <div class="ads-scroll">
+      <table class="ads-tbl">
+        <thead>
+          <tr>
+            <th style="width:210px">Anúncio</th>
+            <th style="width:80px">Status</th>
+            <th style="width:170px">Alcance</th>
+            <th class="r">Impressões</th>
+            <th class="r">Interações</th>
+            <th class="r">Reações</th>
+            <th class="r">Partilhas</th>
+            <th class="r">Investimento</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="ad-nm">Enxovais Gratuitos</div></td>
+            <td><span class="tag tag-on">● Ativo</span></td>
+            <td>
+              <div class="bar-wrap">
+                <div class="bar-num">51.985</div>
+                <div class="bar-bg"><div class="bar-fg" style="width:100%"></div></div>
+              </div>
+            </td>
+            <td class="r"><span class="n">64.635</span></td>
+            <td class="r"><span class="n">22.655</span></td>
+            <td class="r"><span class="n">770</span></td>
+            <td class="r"><span class="n">140</span></td>
+            <td class="r"><span class="n">R$ 336,40</span></td>
+          </tr>
+          <tr>
+            <td><div class="ad-nm">Aquecendo Corações 2026</div></td>
+            <td><span class="tag tag-on">● Ativo</span></td>
+            <td>
+              <div class="bar-wrap">
+                <div class="bar-num">34.630</div>
+                <div class="bar-bg"><div class="bar-fg" style="width:66.6%"></div></div>
+              </div>
+            </td>
+            <td class="r"><span class="n">43.770</span></td>
+            <td class="r"><span class="n">14.255</span></td>
+            <td class="r"><span class="n">310</span></td>
+            <td class="r"><span class="n">30</span></td>
+            <td class="r"><span class="n">R$ 239,40</span></td>
+          </tr>
+          <tr>
+            <td><div class="ad-nm">Nova UBS + Complexo Esportivo</div></td>
+            <td><span class="tag tag-on">● Ativo</span></td>
+            <td>
+              <div class="bar-wrap">
+                <div class="bar-num">38.300</div>
+                <div class="bar-bg"><div class="bar-fg" style="width:73.7%"></div></div>
+              </div>
+            </td>
+            <td class="r"><span class="n">43.310</span></td>
+            <td class="r"><span class="n">11.925</span></td>
+            <td class="r"><span class="n">375</span></td>
+            <td class="r"><span class="n">50</span></td>
+            <td class="r"><span class="n">R$ 219,80</span></td>
+          </tr>
+          <tr>
+            <td><div class="ad-nm">Valorização dos Servidores</div></td>
+            <td><span class="tag tag-on">● Ativo</span></td>
+            <td>
+              <div class="bar-wrap">
+                <div class="bar-num">22.210</div>
+                <div class="bar-bg"><div class="bar-fg" style="width:42.7%"></div></div>
+              </div>
+            </td>
+            <td class="r"><span class="n">25.360</span></td>
+            <td class="r"><span class="n">7.990</span></td>
+            <td class="r"><span class="n">340</span></td>
+            <td class="r"><span class="n">10</span></td>
+            <td class="r"><span class="n">R$ 133,80</span></td>
+          </tr>
+          <tr>
+            <td><div class="ad-nm">Duas Novas UBSs</div></td>
+            <td><span class="tag tag-off">✕ Rejeitado</span></td>
+            <td>
+              <div class="bar-wrap">
+                <div class="bar-num">18.605</div>
+                <div class="bar-bg"><div class="bar-fg" style="width:35.8%; background:#fb923c"></div></div>
+              </div>
+            </td>
+            <td class="r"><span class="n">19.880</span></td>
+            <td class="r"><span class="n">6.265</span></td>
+            <td class="r"><span class="n">170</span></td>
+            <td class="r"><span class="n">5</span></td>
+            <td class="r"><span class="n">R$ 99,95</span></td>
+          </tr>
+          <tr>
+            <td><div class="ad-nm">Projeto Crescer +200 pessoas</div></td>
+            <td><span class="tag tag-on">● Ativo</span></td>
+            <td>
+              <div class="bar-wrap">
+                <div class="bar-num">2.690</div>
+                <div class="bar-bg"><div class="bar-fg" style="width:5.2%; background:#94a8c0"></div></div>
+              </div>
+            </td>
+            <td class="r"><span class="n">3.015</span></td>
+            <td class="r"><span class="n">800</span></td>
+            <td class="r"><span class="n">20</span></td>
+            <td class="r"><span class="n">—</span></td>
+            <td class="r"><span class="n">R$ 15,70</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── SEGMENTAÇÃO ────────────────────────── -->
+  <div class="sh"><span class="sh-lbl">Segmentação</span><div class="sh-line"></div></div>
+  <div class="g2 mb">
+
+    <div class="card">
+      <div class="card-title">Faixa Etária — Alcance</div>
+      <div class="hbl">
+        <div class="hbl-row">
+          <span class="hbl-lbl">18–24</span>
+          <div class="hbl-track"><div class="hbl-fill" style="width:68.1%"></div></div>
+          <span class="hbl-val">39.040</span>
+        </div>
+        <div class="hbl-row">
+          <span class="hbl-lbl">25–34</span>
+          <div class="hbl-track"><div class="hbl-fill" style="width:100%"></div></div>
+          <span class="hbl-val">57.375</span>
+        </div>
+        <div class="hbl-row">
+          <span class="hbl-lbl">35–44</span>
+          <div class="hbl-track"><div class="hbl-fill" style="width:56.7%"></div></div>
+          <span class="hbl-val">32.520</span>
+        </div>
+        <div class="hbl-row">
+          <span class="hbl-lbl">45–54</span>
+          <div class="hbl-track"><div class="hbl-fill" style="width:33.6%"></div></div>
+          <span class="hbl-val">19.275</span>
+        </div>
+        <div class="hbl-row">
+          <span class="hbl-lbl">55–64</span>
+          <div class="hbl-track"><div class="hbl-fill" style="width:18.6%"></div></div>
+          <span class="hbl-val">10.675</span>
+        </div>
+        <div class="hbl-row">
+          <span class="hbl-lbl">65+</span>
+          <div class="hbl-track"><div class="hbl-fill" style="width:12.3%"></div></div>
+          <span class="hbl-val">7.055</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Distribuição por Gênero</div>
+      <div class="gen-boxes">
+        <div class="gen-box f">
+          <div class="gen-pct">53,5%</div>
+          <div class="gen-nm">Feminino</div>
+          <div class="gen-ct">89.780 pessoas</div>
+        </div>
+        <div class="gen-box m">
+          <div class="gen-pct">46,3%</div>
+          <div class="gen-nm">Masculino</div>
+          <div class="gen-ct">77.850 pessoas</div>
+        </div>
+      </div>
+      <div class="gen-sub">Interações por gênero</div>
+      <div class="hbl">
+        <div class="hbl-row" style="grid-template-columns: 68px 1fr 60px">
+          <span class="hbl-lbl" style="color:#9d174d">Feminino</span>
+          <div class="hbl-track"><div class="hbl-fill" style="width:100%; background:#f9a8d4"></div></div>
+          <span class="hbl-val">36.205</span>
+        </div>
+        <div class="hbl-row" style="grid-template-columns: 68px 1fr 60px">
+          <span class="hbl-lbl" style="color:#1e40af">Masculino</span>
+          <div class="hbl-track"><div class="hbl-fill" style="width:76.2%"></div></div>
+          <span class="hbl-val">27.595</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── POSICIONAMENTO ─────────────────────── -->
+  <div class="sh"><span class="sh-lbl">Por Posicionamento</span><div class="sh-line"></div></div>
+  <div class="g3 mb">
+
+    <div class="plc">
+      <div class="plc-head">
+        <span class="plc-name">Feed</span>
+        <span class="plc-badge">↑ Mais interações</span>
+      </div>
+      <div class="plc-row"><span class="plc-k">Alcance</span><span class="plc-v">82.520</span></div>
+      <div class="plc-row"><span class="plc-k">Impressões</span><span class="plc-v">91.975</span></div>
+      <div class="plc-row"><span class="plc-k">Interações</span><span class="plc-v">34.150</span></div>
+      <div class="plc-row"><span class="plc-k">Investimento</span><span class="plc-v">R$ 517,50</span></div>
+      <div class="plc-share">
+        <div class="plc-share-lbl">% do total de interações</div>
+        <div class="plc-bar-bg"><div class="plc-bar-fg" style="width:53.4%"></div></div>
+      </div>
+    </div>
+
+    <div class="plc">
+      <div class="plc-head">
+        <span class="plc-name">Reels</span>
+      </div>
+      <div class="plc-row"><span class="plc-k">Alcance</span><span class="plc-v">80.375</span></div>
+      <div class="plc-row"><span class="plc-k">Impressões</span><span class="plc-v">89.660</span></div>
+      <div class="plc-row"><span class="plc-k">Interações</span><span class="plc-v">26.210</span></div>
+      <div class="plc-row"><span class="plc-k">Investimento</span><span class="plc-v">R$ 448,00</span></div>
+      <div class="plc-share">
+        <div class="plc-share-lbl">% do total de interações</div>
+        <div class="plc-bar-bg"><div class="plc-bar-fg" style="width:41.0%"></div></div>
+      </div>
+    </div>
+
+    <div class="plc">
+      <div class="plc-head">
+        <span class="plc-name">Stories</span>
+      </div>
+      <div class="plc-row"><span class="plc-k">Alcance</span><span class="plc-v">17.155</span></div>
+      <div class="plc-row"><span class="plc-k">Impressões</span><span class="plc-v">18.335</span></div>
+      <div class="plc-row"><span class="plc-k">Interações</span><span class="plc-v">3.660</span></div>
+      <div class="plc-row"><span class="plc-k">Investimento</span><span class="plc-v">R$ 78,20</span></div>
+      <div class="plc-share">
+        <div class="plc-share-lbl">% do total de interações</div>
+        <div class="plc-bar-bg"><div class="plc-bar-fg" style="width:5.7%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RETENÇÃO DE VÍDEO ──────────────────── -->
+  <div class="sh"><span class="sh-lbl">Retenção de Vídeo</span><div class="sh-line"></div></div>
+  <div class="card mb">
+    <div class="ret-grid">
+
+      <div>
+        <div class="ret-nm">Enxovais Gratuitos</div>
+        <div class="ret-trio">
+          <div class="ret-row">
+            <span class="ret-lbl">25%</span>
+            <div class="ret-track"><div class="ret-fill r25" style="width:100%"></div></div>
+            <span class="ret-ct">4.360</span>
+          </div>
+          <div class="ret-row">
+            <span class="ret-lbl">50%</span>
+            <div class="ret-track"><div class="ret-fill r50" style="width:65.7%"></div></div>
+            <span class="ret-ct">2.865</span>
+          </div>
+          <div class="ret-row">
+            <span class="ret-lbl">75%</span>
+            <div class="ret-track"><div class="ret-fill r75" style="width:50.7%"></div></div>
+            <span class="ret-ct">2.210</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="ret-nm">Aquecendo Corações</div>
+        <div class="ret-trio">
+          <div class="ret-row">
+            <span class="ret-lbl">25%</span>
+            <div class="ret-track"><div class="ret-fill r25" style="width:44.4%"></div></div>
+            <span class="ret-ct">1.935</span>
+          </div>
+          <div class="ret-row">
+            <span class="ret-lbl">50%</span>
+            <div class="ret-track"><div class="ret-fill r50" style="width:23.7%"></div></div>
+            <span class="ret-ct">1.035</span>
+          </div>
+          <div class="ret-row">
+            <span class="ret-lbl">75%</span>
+            <div class="ret-track"><div class="ret-fill r75" style="width:11.2%"></div></div>
+            <span class="ret-ct">490</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="ret-nm">Nova UBS + Complexo</div>
+        <div class="ret-trio">
+          <div class="ret-row">
+            <span class="ret-lbl">25%</span>
+            <div class="ret-track"><div class="ret-fill r25" style="width:72.7%"></div></div>
+            <span class="ret-ct">3.170</span>
+          </div>
+          <div class="ret-row">
+            <span class="ret-lbl">50%</span>
+            <div class="ret-track"><div class="ret-fill r50" style="width:46.6%"></div></div>
+            <span class="ret-ct">2.030</span>
+          </div>
+          <div class="ret-row">
+            <span class="ret-lbl">75%</span>
+            <div class="ret-track"><div class="ret-fill r75" style="width:33.8%"></div></div>
+            <span class="ret-ct">1.475</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="ret-nm">Valorização Servidores</div>
+        <div class="ret-trio">
+          <div class="ret-row">
+            <span class="ret-lbl">25%</span>
+            <div class="ret-track"><div class="ret-fill r25" style="width:78.1%"></div></div>
+            <span class="ret-ct">3.405</span>
+          </div>
+          <div class="ret-row">
+            <span class="ret-lbl">50%</span>
+            <div class="ret-track"><div class="ret-fill r50" style="width:34.3%"></div></div>
+            <span class="ret-ct">1.495</span>
+          </div>
+          <div class="ret-row">
+            <span class="ret-lbl">75%</span>
+            <div class="ret-track"><div class="ret-fill r75" style="width:20.9%"></div></div>
+            <span class="ret-ct">910</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="ret-nm">Duas Novas UBSs</div>
+        <div class="ret-trio">
+          <div class="ret-row">
+            <span class="ret-lbl">25%</span>
+            <div class="ret-track"><div class="ret-fill r25" style="width:41.3%"></div></div>
+            <span class="ret-ct">1.800</span>
+          </div>
+          <div class="ret-row">
+            <span class="ret-lbl">50%</span>
+            <div class="ret-track"><div class="ret-fill r50" style="width:21.0%"></div></div>
+            <span class="ret-ct">915</span>
+          </div>
+          <div class="ret-row">
+            <span class="ret-lbl">75%</span>
+            <div class="ret-track"><div class="ret-fill r75" style="width:12.7%"></div></div>
+            <span class="ret-ct">555</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="ret-nm">Projeto Crescer</div>
+        <div class="ret-trio">
+          <div class="ret-row">
+            <span class="ret-lbl">25%</span>
+            <div class="ret-track"><div class="ret-fill r25" style="width:1.2%"></div></div>
+            <span class="ret-ct">50</span>
+          </div>
+          <div class="ret-row">
+            <span class="ret-lbl">50%</span>
+            <div class="ret-track"><div class="ret-fill r50" style="width:0.7%"></div></div>
+            <span class="ret-ct">30</span>
+          </div>
+          <div class="ret-row">
+            <span class="ret-lbl">75%</span>
+            <div class="ret-track"><div class="ret-fill r75" style="width:0.5%"></div></div>
+            <span class="ret-ct">20</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="ret-legend">
+      <span class="ret-leg-title">Legenda</span>
+      <span class="ret-leg-item">
+        <span class="ret-leg-dot" style="background:#1d6af5"></span>25% assistido
+      </span>
+      <span class="ret-leg-item">
+        <span class="ret-leg-dot" style="background:#74b0fa"></span>50% assistido
+      </span>
+      <span class="ret-leg-item">
+        <span class="ret-leg-dot" style="background:#c5d9fd"></span>75% assistido
+      </span>
+      <span class="ret-leg-note">* barras normalizadas pelo maior valor de 25% (4.360 — Enxovais Gratuitos)</span>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Elviz Cezar · Prefeitura de Santana de Parnaíba &nbsp;·&nbsp; Últimos 30 dias &nbsp;·&nbsp; Fonte: Meta Ads Manager
+</footer>
+
+
+<template id="__bundler_thumbnail" data-bg-color="#1d6af5">
+  <svg viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
+    <rect width="120" height="80" fill="#1d6af5"/>
+    <rect x="14" y="14" width="26" height="16" rx="3" fill="white" opacity=".9"/>
+    <rect x="47" y="14" width="26" height="16" rx="3" fill="white" opacity=".9"/>
+    <rect x="80" y="14" width="26" height="16" rx="3" fill="white" opacity=".9"/>
+    <rect x="14" y="36" width="92" height="6" rx="2" fill="white" opacity=".15"/>
+    <rect x="14" y="36" width="60" height="6" rx="2" fill="white" opacity=".5"/>
+    <rect x="14" y="46" width="92" height="6" rx="2" fill="white" opacity=".15"/>
+    <rect x="14" y="46" width="40" height="6" rx="2" fill="white" opacity=".5"/>
+    <rect x="14" y="56" width="92" height="6" rx="2" fill="white" opacity=".15"/>
+    <rect x="14" y="56" width="75" height="6" rx="2" fill="white" opacity=".5"/>
+    <text x="60" y="76" text-anchor="middle" fill="white" font-size="5" opacity=".6" font-family="sans-serif">Gov 360</text>
+  </svg>
+</template>
+</body>
+</html>

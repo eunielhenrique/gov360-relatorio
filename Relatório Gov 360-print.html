@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elviz Cezar — Relatório de Campanhas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #f1f5fb;
+      --surface: #ffffff;
+      --primary: #1d6af5;
+      --plight:  #e8f0fe;
+      --text:    #0c1830;
+      --t2:      #4a5d78;
+      --t3:      #96a8bb;
+      --border:  #e2eaf4;
+      --r:       14px;
+      --shadow:  0 1px 3px rgba(12,24,60,.04), 0 4px 20px rgba(12,24,60,.07);
+      --green:   #15803d; --gbg: #dcfce7;
+      --orange:  #c2410c; --obg: #ffedd5;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background: var(--bg); color: var(--text);
+      -webkit-font-smoothing: antialiased; line-height: 1.5;
+    }
+
+    /* ─── HEADER ─────────────────────────────── */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      height: 58px; display: flex; align-items: center;
+      padding: 0 40px; gap: 14px;
+    }
+    .hd-brand {
+      display: flex; align-items: center; gap: 9px;
+      font-weight: 800; font-size: 16px; letter-spacing: -.4px;
+    }
+    .hd-icon {
+      width: 28px; height: 28px; border-radius: 7px;
+      background: var(--primary); color: #fff;
+      font-size: 11px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .hd-sep { width: 1px; height: 18px; background: var(--border); }
+    .hd-sub { font-size: 14px; font-weight: 500; color: var(--t2); }
+    .hd-space { flex: 1; }
+    .pill {
+      padding: 4px 11px; border-radius: 999px;
+      font-size: 12px; font-weight: 600; white-space: nowrap;
+    }
+    .pill-blue { background: var(--plight); color: var(--primary); }
+    .pill-gray { background: var(--bg); color: var(--t2); border: 1px solid var(--border); }
+
+    /* ─── WRAPPER ────────────────────────────── */
+    .wrap { max-width: 1300px; margin: 0 auto; padding: 28px 40px 72px; }
+
+    /* ─── SECTION HEADER ─────────────────────── */
+    .sh { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .sh-lbl {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .08em; color: var(--t3); white-space: nowrap;
+    }
+    .sh-line { flex: 1; height: 1px; background: var(--border); }
+
+    /* ─── KPI GRID ───────────────────────────── */
+    .kpi-grid {
+      display: grid; grid-template-columns: repeat(6, 1fr);
+      gap: 12px; margin-bottom: 28px;
+    }
+    .kpi {
+      background: var(--surface); border-radius: var(--r);
+      padding: 18px 20px; box-shadow: var(--shadow);
+    }
+    .kpi-lbl {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--t3); margin-bottom: 8px;
+    }
+    .kpi-val {
+      font-size: 26px; font-weight: 800; letter-spacing: -1.5px;
+      line-height: 1; color: var(--text);
+    }
+    .kpi-val.blue { color: var(--primary); }
+    .kpi-hint { font-size: 11.5px; color: var(--t3); margin-top: 5px; }
+
+    /* ─── WEEKLY TREND ───────────────────────── */
+    .week-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 14px; margin-bottom: 20px;
+    }
+    .week-card {
+      background: var(--surface); border-radius: var(--r);
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .week-card-top {
+      padding: 14px 18px 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+    }
+    .week-card-num {
+      font-size: 13px; font-weight: 800; color: var(--text);
+    }
+    .week-card-range {
+      font-size: 12px; color: var(--t3); font-weight: 500;
+    }
+    .week-delta {
+      margin-left: auto; font-size: 11px; font-weight: 700;
+      padding: 2px 6px; border-radius: 4px;
+    }
+    .up   { background: #dcfce7; color: #15803d; }
+    .down { background: #ffedd5; color: #c2410c; }
+    .week-card-body { padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+    .week-stat { display: flex; align-items: center; gap: 8px; }
+    .week-stat-lbl { font-size: 12px; color: var(--t2); flex: 1; }
+    .week-stat-val { font-size: 14px; font-weight: 700; color: var(--text); }
+    .week-bar-track {
+      width: 48px; height: 5px; background: var(--border);
+      border-radius: 3px; overflow: hidden;
+    }
+    .week-bar-fill { height: 100%; border-radius: 3px; background: var(--primary); }
+
+    /* ─── CARD ───────────────────────────────── */
+    .card {
+      background: var(--surface); border-radius: var(--r);
+      box-shadow: var(--shadow); padding: 24px;
+    }
+    .card-title {
+      font-size: 14px; font-weight: 700;
+      color: var(--text); margin-bottom: 18px;
+    }
+    .mb { margin-bottom: 20px; }
+
+    /* ─── ADS TABLE ──────────────────────────── */
+    .ads-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .ads-scroll-hint {
+      display: none; font-size: 11px; color: var(--t3);
+      text-align: center; padding: 6px 0 2px; letter-spacing: .02em;
+    }
+    .ads-tbl { width: 100%; border-collapse: collapse; min-width: 680px; }
+    .ads-tbl th {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--t3);
+      padding: 0 16px 11px 0; text-align: left;
+      border-bottom: 1.5px solid var(--border);
+    }
+    .ads-tbl th:first-child, .ads-tbl td:first-child { padding-left: 0; }
+    .ads-tbl th.r, .ads-tbl td.r { text-align: right; }
+    .ads-tbl td {
+      padding: 13px 16px 13px 0; border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .ads-tbl tr:last-child td { border-bottom: none; }
+    .ad-nm {
+      font-size: 13px; font-weight: 600; line-height: 1.35;
+      max-width: 220px; color: var(--text);
+    }
+    .tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 7px; border-radius: 5px;
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .04em;
+    }
+    .tag-on  { background: var(--gbg); color: var(--green); }
+    .tag-off { background: var(--obg); color: var(--orange); }
+    .bar-wrap { width: 160px; }
+    .bar-num  { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .bar-bg   { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .bar-fg   { height: 100%; border-radius: 3px; background: var(--primary); }
+    .n { font-size: 14px; font-weight: 700; color: var(--text); }
+
+    /* ─── GRIDS ──────────────────────────────── */
+    .g2 { display: grid; grid-template-columns: 1fr 1fr;       gap: 16px; }
+    .g3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+
+    /* ─── HORIZONTAL BAR LIST ────────────────── */
+    .hbl { display: flex; flex-direction: column; gap: 10px; }
+    .hbl-row {
+      display: grid; grid-template-columns: 52px 1fr 56px;
+      align-items: center; gap: 8px;
+    }
+    .hbl-lbl   { font-size: 12.5px; font-weight: 500; color: var(--t2); }
+    .hbl-track { height: 7px; background: var(--border); border-radius: 3.5px; overflow: hidden; }
+    .hbl-fill  { height: 100%; border-radius: 3.5px; background: var(--primary); }
+    .hbl-val   { font-size: 12px; font-weight: 700; color: var(--t2); text-align: right; }
+
+    /* ─── GENDER ─────────────────────────────── */
+    .gen-boxes {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px; margin-bottom: 20px;
+    }
+    .gen-box { border-radius: 12px; padding: 16px; text-align: center; }
+    .gen-box.f { background: #fce7f3; }
+    .gen-box.m { background: #eff6ff; }
+    .gen-pct { font-size: 24px; font-weight: 800; letter-spacing: -1px; line-height: 1; }
+    .gen-box.f .gen-pct { color: #9d174d; }
+    .gen-box.m .gen-pct { color: #1e40af; }
+    .gen-nm { font-size: 12px; font-weight: 600; color: var(--t2); margin-top: 4px; }
+    .gen-ct { font-size: 11px; color: var(--t3); }
+    .gen-sub { font-size: 12px; font-weight: 600; color: var(--t2); margin-bottom: 10px; }
+
+    /* ─── PLACEMENT ──────────────────────────── */
+    .plc {
+      background: var(--surface); border-radius: var(--r);
+      padding: 22px; box-shadow: var(--shadow);
+    }
+    .plc-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .plc-name { font-size: 14px; font-weight: 700; color: var(--text); }
+    .plc-badge {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .04em; padding: 2px 7px; border-radius: 4px;
+      background: var(--plight); color: var(--primary);
+    }
+    .plc-row {
+      display: flex; justify-content: space-between;
+      font-size: 13px; padding: 6px 0; border-bottom: 1px solid var(--border);
+    }
+    .plc-row:last-of-type { border-bottom: none; }
+    .plc-k { color: var(--t2); }
+    .plc-v { font-weight: 700; }
+    .plc-share { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+    .plc-share-lbl {
+      font-size: 11px; font-weight: 600; color: var(--t3);
+      text-transform: uppercase; letter-spacing: .04em; margin-bottom: 5px;
+    }
+    .plc-bar-bg  { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .plc-bar-fg  { height: 100%; border-radius: 3px; background: var(--primary); }
+
+    /* ─── RETENTION ──────────────────────────── */
+    .ret-grid {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 24px 28px;
+    }
+    .ret-nm { font-size: 12px; font-weight: 600; color: var(--t2); margin-bottom: 8px; }
+    .ret-trio { display: flex; flex-direction: column; gap: 3px; }
+    .ret-row { display: flex; align-items: center; gap: 7px; }
+    .ret-lbl {
+      font-size: 10px; font-weight: 700; color: var(--t3); width: 22px; flex-shrink: 0;
+    }
+    .ret-track {
+      flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden;
+    }
+    .ret-fill { height: 100%; border-radius: 4px; }
+    .r25 { background: #1d6af5; }
+    .r50 { background: #74b0fa; }
+    .r75 { background: #c5d9fd; }
+    .ret-ct {
+      font-size: 11px; font-weight: 700; color: var(--t2);
+      width: 40px; text-align: right; flex-shrink: 0;
+    }
+    .ret-legend {
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+      margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border);
+    }
+    .ret-leg-title {
+      font-size: 11px; font-weight: 700; color: var(--t3);
+      text-transform: uppercase; letter-spacing: .04em;
+    }
+    .ret-leg-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--t2); }
+    .ret-leg-dot { width: 12px; height: 7px; border-radius: 3px; flex-shrink: 0; }
+    .ret-leg-note { flex: 1; text-align: right; font-size: 11px; color: var(--t3); }
+
+    /* ─── FOOTER ─────────────────────────────── */
+    footer {
+      text-align: center; padding: 20px 40px;
+      font-size: 12px; color: var(--t3);
+    }
+
+    /* ══════════════════════════════════════════
+       MOBILE RESPONSIVE
+    ══════════════════════════════════════════ */
+    @media (max-width: 1024px) {
+      .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      header { padding: 0 20px; gap: 10px; }
+      .hd-sub { display: none; }
+      .hd-sep { display: none; }
+      .wrap { padding: 20px 16px 56px; }
+
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+      .kpi { padding: 14px 16px; }
+      .kpi-val { font-size: 22px; letter-spacing: -1px; }
+      .kpi-hint { font-size: 11px; }
+
+      .week-grid { grid-template-columns: 1fr; gap: 10px; }
+
+      .g2 { grid-template-columns: 1fr; }
+      .g3 { grid-template-columns: 1fr; }
+
+      .ads-scroll-hint { display: block; }
+      .ads-tbl { min-width: 680px; }
+
+      .ret-grid { grid-template-columns: 1fr 1fr; gap: 16px 20px; }
+
+      .plc-head { flex-wrap: wrap; gap: 6px; }
+
+      .ret-legend { gap: 8px; }
+      .ret-leg-note { display: none; }
+    }
+
+    @media (max-width: 480px) {
+      header { height: 52px; }
+      .hd-brand { font-size: 15px; }
+      .pill-gray { display: none; }
+      .wrap { padding: 16px 12px 48px; }
+
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .kpi { padding: 12px 14px; }
+      .kpi-val { font-size: 20px; }
+      .kpi-lbl { font-size: 10px; }
+
+      .ret-grid { grid-template-columns: 1fr; }
+
+      .card { padding: 16px; }
+      .card-title { font-size: 13px; margin-bottom: 14px; }
+
+      .sh-lbl { font-size: 10px; }
+
+      .gen-pct { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="hd-brand">
+    Elviz Cezar
+  </div>
+  <div class="hd-sep"></div>
+  <span class="hd-sub">Prefeito de Santana de Parnaíba</span>
+  <div class="hd-space"></div>
+  <span class="pill pill-blue">01 – 27/jun/2026</span>
+  <span class="pill pill-gray">Meta Ads · 6 anúncios</span>
+</header>
+
+<div class="wrap">
+
+  <!-- ── VISÃO GERAL ─────────────────────────── -->
+  <div class="sh"><span class="sh-lbl">Visão Geral · 27 dias</span><div class="sh-line"></div></div>
+  <div class="kpi-grid mb">
+    <div class="kpi">
+      <div class="kpi-lbl">Alcance Total</div>
+      <div class="kpi-val">101.052</div>
+      <div class="kpi-hint">pessoas únicas</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl">Impressões</div>
+      <div class="kpi-val">119.982</div>
+      <div class="kpi-hint">freq. média 1,19×</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl">Interações</div>
+      <div class="kpi-val">38.334</div>
+      <div class="kpi-hint">engajamentos totais</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl">Investimento</div>
+      <div class="kpi-val blue">R$ 627</div>
+      <div class="kpi-hint">R$ 0,016 / interação</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl">Retenção 75%</div>
+      <div class="kpi-val">3.396</div>
+      <div class="kpi-hint">views ≥ 75% do vídeo</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl">Novos Seguidores</div>
+      <div class="kpi-val">27</div>
+      <div class="kpi-hint">ganhos no Instagram</div>
+    </div>
+  </div>
+
+  <!-- ── TENDÊNCIA SEMANAL ──────────────────── -->
+  <div class="sh"><span class="sh-lbl">Tendência Semanal</span><div class="sh-line"></div></div>
+  <div class="week-grid mb">
+
+    <!-- Semana 1 -->
+    <div class="week-card">
+      <div class="week-card-top">
+        <span class="week-card-num">Semana 1</span>
+        <span class="week-card-range">01 – 09 jun</span>
+      </div>
+      <div class="week-card-body">
+        <div class="week-stat">
+          <span class="week-stat-lbl">Alcance</span>
+          <div class="week-bar-track"><div class="week-bar-fill" style="width:95.7%"></div></div>
+          <span class="week-stat-val">33.684</span>
+        </div>
+        <div class="week-stat">
+          <span class="week-stat-lbl">Interações</span>
+          <div class="week-bar-track"><div class="week-bar-fill" style="width:96.5%"></div></div>
+          <span class="week-stat-val">12.778</span>
+        </div>
+        <div class="week-stat">
+          <span class="week-stat-lbl">Investimento</span>
+          <div class="week-bar-track"><div class="week-bar-fill" style="width:98.4%"></div></div>
+          <span class="week-stat-val">R$ 209</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Semana 2 -->
+    <div class="week-card">
+      <div class="week-card-top" style="background: #f8faff;">
+        <span class="week-card-num">Semana 2</span>
+        <span class="week-card-range">10 – 18 jun</span>
+        <span class="week-delta up">↑ +4,6%</span>
+      </div>
+      <div class="week-card-body">
+        <div class="week-stat">
+          <span class="week-stat-lbl">Alcance</span>
+          <div class="week-bar-track"><div class="week-bar-fill" style="width:100%"></div></div>
+          <span class="week-stat-val" style="color:var(--primary)">35.210</span>
+        </div>
+        <div class="week-stat">
+          <span class="week-stat-lbl">Interações</span>
+          <div class="week-bar-track"><div class="week-bar-fill" style="width:100%"></div></div>
+          <span class="week-stat-val" style="color:var(--primary)">13.245</span>
+        </div>
+        <div class="week-stat">
+          <span class="week-stat-lbl">Investimento</span>
+          <div class="week-bar-track"><div class="week-bar-fill" style="width:100%"></div></div>
+          <span class="week-stat-val" style="color:var(--primary)">R$ 212</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Semana 3 -->
+    <div class="week-card">
+      <div class="week-card-top">
+        <span class="week-card-num">Semana 3</span>
+        <span class="week-card-range">19 – 27 jun</span>
+        <span class="week-delta down">↓ −8,7%</span>
+      </div>
+      <div class="week-card-body">
+        <div class="week-stat">
+          <span class="week-stat-lbl">Alcance</span>
+          <div class="week-bar-track"><div class="week-bar-fill" style="width:91.3%"></div></div>
+          <span class="week-stat-val">32.158</span>
+        </div>
+        <div class="week-stat">
+          <span class="week-stat-lbl">Interações</span>
+          <div class="week-bar-track"><div class="week-bar-fill" style="width:93.0%"></div></div>
+          <span class="week-stat-val">12.311</span>
+        </div>
+        <div class="week-stat">
+          <span class="week-stat-lbl">Investimento</span>
+          <div class="week-bar-track"><div class="week-bar-fill" style="width:96.7%"></div></div>
+          <span class="week-stat-val">R$ 206</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── ANÚNCIOS ───────────────────────────── -->
+  <div class="sh"><span class="sh-lbl">Performance por Anúncio</span><div class="sh-line"></div></div>
+  <div class="card mb">
+    <span class="ads-scroll-hint">← deslize para ver mais →</span>
+    <div class="ads-scroll">
+      <table class="ads-tbl">
+        <thead>
+          <tr>
+            <th style="width:210px">Anúncio</th>
+            <th style="width:80px">Status</th>
+            <th style="width:170px">Alcance</th>
+            <th class="r">Impressões</th>
+            <th class="r">Interações</th>
+            <th class="r">Reações</th>
+            <th class="r">Partilhas</th>
+            <th class="r">Investimento</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="ad-nm">Enxovais Gratuitos</div></td>
+            <td><span class="tag tag-on">● Ativo</span></td>
+            <td>
+              <div class="bar-wrap">
+                <div class="bar-num">31.191</div>
+                <div class="bar-bg"><div class="bar-fg" style="width:100%"></div></div>
+              </div>
+            </td>
+            <td class="r"><span class="n">38.781</span></td>
+            <td class="r"><span class="n">13.593</span></td>
+            <td class="r"><span class="n">462</span></td>
+            <td class="r"><span class="n">84</span></td>
+            <td class="r"><span class="n">R$ 201,84</span></td>
+          </tr>
+          <tr>
+            <td><div class="ad-nm">Aquecendo Corações 2026</div></td>
+            <td><span class="tag tag-on">● Ativo</span></td>
+            <td>
+              <div class="bar-wrap">
+                <div class="bar-num">20.778</div>
+                <div class="bar-bg"><div class="bar-fg" style="width:66.6%"></div></div>
+              </div>
+            </td>
+            <td class="r"><span class="n">26.262</span></td>
+            <td class="r"><span class="n">8.553</span></td>
+            <td class="r"><span class="n">186</span></td>
+            <td class="r"><span class="n">18</span></td>
+            <td class="r"><span class="n">R$ 143,64</span></td>
+          </tr>
+          <tr>
+            <td><div class="ad-nm">Nova UBS + Complexo Esportivo</div></td>
+            <td><span class="tag tag-on">● Ativo</span></td>
+            <td>
+              <div class="bar-wrap">
+                <div class="bar-num">22.980</div>
+                <div class="bar-bg"><div class="bar-fg" style="width:73.7%"></div></div>
+              </div>
+            </td>
+            <td class="r"><span class="n">25.986</span></td>
+            <td class="r"><span class="n">7.155</span></td>
+            <td class="r"><span class="n">225</span></td>
+            <td class="r"><span class="n">30</span></td>
+            <td class="r"><span class="n">R$ 131,88</span></td>
+          </tr>
+          <tr>
+            <td><div class="ad-nm">Valorização dos Servidores</div></td>
+            <td><span class="tag tag-on">● Ativo</span></td>
+            <td>
+              <div class="bar-wrap">
+                <div class="bar-num">13.326</div>
+                <div class="bar-bg"><div class="bar-fg" style="width:42.7%"></div></div>
+              </div>
+            </td>
+            <td class="r"><span class="n">15.216</span></td>
+            <td class="r"><span class="n">4.794</span></td>
+            <td class="r"><span class="n">204</span></td>
+            <td class="r"><span class="n">6</span></td>
+            <td class="r"><span class="n">R$ 80,28</span></td>
+          </tr>
+          <tr>
+            <td><div class="ad-nm">Duas Novas UBSs</div></td>
+            <td><span class="tag tag-off">✕ Rejeitado</span></td>
+            <td>
+              <div class="bar-wrap">
+                <div class="bar-num">11.163</div>
+                <div class="bar-bg"><div class="bar-fg" style="width:35.8%; background:#fb923c"></div></div>
+              </div>
+            </td>
+            <td class="r"><span class="n">11.928</span></td>
+            <td class="r"><span class="n">3.759</span></td>
+            <td class="r"><span class="n">102</span></td>
+            <td class="r"><span class="n">3</span></td>
+            <td class="r"><span class="n">R$ 59,97</span></td>
+          </tr>
+          <tr>
+            <td><div class="ad-nm">Projeto Crescer +200 pessoas</div></td>
+            <td><span class="tag tag-on">● Ativo</span></td>
+            <td>
+              <div class="bar-wrap">
+                <div class="bar-num">1.614</div>
+                <div class="bar-bg"><div class="bar-fg" style="width:5.2%; background:#94a8c0"></div></div>
+              </div>
+            </td>
+            <td class="r"><span class="n">1.809</span></td>
+            <td class="r"><span class="n">480</span></td>
+            <td class="r"><span class="n">12</span></td>
+            <td class="r"><span class="n">—</span></td>
+            <td class="r"><span class="n">R$ 9,42</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── SEGMENTAÇÃO ────────────────────────── -->
+  <div class="sh"><span class="sh-lbl">Segmentação</span><div class="sh-line"></div></div>
+  <div class="g2 mb">
+
+    <div class="card">
+      <div class="card-title">Faixa Etária — Alcance</div>
+      <div class="hbl">
+        <div class="hbl-row">
+          <span class="hbl-lbl">18–24</span>
+          <div class="hbl-track"><div class="hbl-fill" style="width:68.1%"></div></div>
+          <span class="hbl-val">23.424</span>
+        </div>
+        <div class="hbl-row">
+          <span class="hbl-lbl">25–34</span>
+          <div class="hbl-track"><div class="hbl-fill" style="width:100%"></div></div>
+          <span class="hbl-val">34.425</span>
+        </div>
+        <div class="hbl-row">
+          <span class="hbl-lbl">35–44</span>
+          <div class="hbl-track"><div class="hbl-fill" style="width:56.7%"></div></div>
+          <span class="hbl-val">19.512</span>
+        </div>
+        <div class="hbl-row">
+          <span class="hbl-lbl">45–54</span>
+          <div class="hbl-track"><div class="hbl-fill" style="width:33.6%"></div></div>
+          <span class="hbl-val">11.565</span>
+        </div>
+        <div class="hbl-row">
+          <span class="hbl-lbl">55–64</span>
+          <div class="hbl-track"><div class="hbl-fill" style="width:18.6%"></div></div>
+          <span class="hbl-val">6.405</span>
+        </div>
+        <div class="hbl-row">
+          <span class="hbl-lbl">65+</span>
+          <div class="hbl-track"><div class="hbl-fill" style="width:12.3%"></div></div>
+          <span class="hbl-val">4.233</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Distribuição por Gênero</div>
+      <div class="gen-boxes">
+        <div class="gen-box f">
+          <div class="gen-pct">53,5%</div>
+          <div class="gen-nm">Feminino</div>
+          <div class="gen-ct">53.868 pessoas</div>
+        </div>
+        <div class="gen-box m">
+          <div class="gen-pct">46,3%</div>
+          <div class="gen-nm">Masculino</div>
+          <div class="gen-ct">46.710 pessoas</div>
+        </div>
+      </div>
+      <div class="gen-sub">Interações por gênero</div>
+      <div class="hbl">
+        <div class="hbl-row" style="grid-template-columns: 68px 1fr 60px">
+          <span class="hbl-lbl" style="color:#9d174d">Feminino</span>
+          <div class="hbl-track"><div class="hbl-fill" style="width:100%; background:#f9a8d4"></div></div>
+          <span class="hbl-val">21.723</span>
+        </div>
+        <div class="hbl-row" style="grid-template-columns: 68px 1fr 60px">
+          <span class="hbl-lbl" style="color:#1e40af">Masculino</span>
+          <div class="hbl-track"><div class="hbl-fill" style="width:76.2%"></div></div>
+          <span class="hbl-val">16.557</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── POSICIONAMENTO ─────────────────────── -->
+  <div class="sh"><span class="sh-lbl">Por Posicionamento</span><div class="sh-line"></div></div>
+  <div class="g3 mb">
+
+    <div class="plc">
+      <div class="plc-head">
+        <span class="plc-name">Feed</span>
+        <span class="plc-badge">↑ Mais interações</span>
+      </div>
+      <div class="plc-row"><span class="plc-k">Alcance</span><span class="plc-v">49.512</span></div>
+      <div class="plc-row"><span class="plc-k">Impressões</span><span class="plc-v">55.185</span></div>
+      <div class="plc-row"><span class="plc-k">Interações</span><span class="plc-v">20.490</span></div>
+      <div class="plc-row"><span class="plc-k">Investimento</span><span class="plc-v">R$ 310,50</span></div>
+      <div class="plc-share">
+        <div class="plc-share-lbl">% do total de interações</div>
+        <div class="plc-bar-bg"><div class="plc-bar-fg" style="width:53.4%"></div></div>
+      </div>
+    </div>
+
+    <div class="plc">
+      <div class="plc-head">
+        <span class="plc-name">Reels</span>
+      </div>
+      <div class="plc-row"><span class="plc-k">Alcance</span><span class="plc-v">48.225</span></div>
+      <div class="plc-row"><span class="plc-k">Impressões</span><span class="plc-v">53.796</span></div>
+      <div class="plc-row"><span class="plc-k">Interações</span><span class="plc-v">15.726</span></div>
+      <div class="plc-row"><span class="plc-k">Investimento</span><span class="plc-v">R$ 268,80</span></div>
+      <div class="plc-share">
+        <div class="plc-share-lbl">% do total de interações</div>
+        <div class="plc-bar-bg"><div class="plc-bar-fg" style="width:41.0%"></div></div>
+      </div>
+    </div>
+
+    <div class="plc">
+      <div class="plc-head">
+        <span class="plc-name">Stories</span>
+      </div>
+      <div class="plc-row"><span class="plc-k">Alcance</span><span class="plc-v">10.293</span></div>
+      <div class="plc-row"><span class="plc-k">Impressões</span><span class="plc-v">11.001</span></div>
+      <div class="plc-row"><span class="plc-k">Interações</span><span class="plc-v">2.196</span></div>
+      <div class="plc-row"><span class="plc-k">Investimento</span><span class="plc-v">R$ 46,92</span></div>
+      <div class="plc-share">
+        <div class="plc-share-lbl">% do total de interações</div>
+        <div class="plc-bar-bg"><div class="plc-bar-fg" style="width:5.7%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RETENÇÃO DE VÍDEO ──────────────────── -->
+  <div class="sh"><span class="sh-lbl">Retenção de Vídeo</span><div class="sh-line"></div></div>
+  <div class="card mb">
+    <div class="ret-grid">
+
+      <div>
+        <div class="ret-nm">Enxovais Gratuitos</div>
+        <div class="ret-trio">
+          <div class="ret-row">
+            <span class="ret-lbl">25%</span>
+            <div class="ret-track"><div class="ret-fill r25" style="width:100%"></div></div>
+            <span class="ret-ct">2.616</span>
+          </div>
+          <div class="ret-row">
+            <span class="ret-lbl">50%</span>
+            <div class="ret-track"><div class="ret-fill r50" style="width:65.7%"></div></div>
+            <span class="ret-ct">1.719</span>
+          </div>
+          <div class="ret-row">
+            <span class="ret-lbl">75%</span>
+            <div class="ret-track"><div class="ret-fill r75" style="width:50.7%"></div></div>
+            <span class="ret-ct">1.326</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="ret-nm">Aquecendo Corações</div>
+        <div class="ret-trio">
+          <div class="ret-row">
+            <span class="ret-lbl">25%</span>
+            <div class="ret-track"><div class="ret-fill r25" style="width:44.4%"></div></div>
+            <span class="ret-ct">1.161</span>
+          </div>
+          <div class="ret-row">
+            <span class="ret-lbl">50%</span>
+            <div class="ret-track"><div class="ret-fill r50" style="width:23.7%"></div></div>
+            <span class="ret-ct">621</span>
+          </div>
+          <div class="ret-row">
+            <span class="ret-lbl">75%</span>
+            <div class="ret-track"><div class="ret-fill r75" style="width:11.2%"></div></div>
+            <span class="ret-ct">294</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="ret-nm">Nova UBS + Complexo</div>
+        <div class="ret-trio">
+          <div class="ret-row">
+            <span class="ret-lbl">25%</span>
+            <div class="ret-track"><div class="ret-fill r25" style="width:72.7%"></div></div>
+            <span class="ret-ct">1.902</span>
+          </div>
+          <div class="ret-row">
+            <span class="ret-lbl">50%</span>
+            <div class="ret-track"><div class="ret-fill r50" style="width:46.6%"></div></div>
+            <span class="ret-ct">1.218</span>
+          </div>
+          <div class="ret-row">
+            <span class="ret-lbl">75%</span>
+            <div class="ret-track"><div class="ret-fill r75" style="width:33.8%"></div></div>
+            <span class="ret-ct">885</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="ret-nm">Valorização Servidores</div>
+        <div class="ret-trio">
+          <div class="ret-row">
+            <span class="ret-lbl">25%</span>
+            <div class="ret-track"><div class="ret-fill r25" style="width:78.1%"></div></div>
+            <span class="ret-ct">2.043</span>
+          </div>
+          <div class="ret-row">
+            <span class="ret-lbl">50%</span>
+            <div class="ret-track"><div class="ret-fill r50" style="width:34.3%"></div></div>
+            <span class="ret-ct">897</span>
+          </div>
+          <div class="ret-row">
+            <span class="ret-lbl">75%</span>
+            <div class="ret-track"><div class="ret-fill r75" style="width:20.9%"></div></div>
+            <span class="ret-ct">546</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="ret-nm">Duas Novas UBSs</div>
+        <div class="ret-trio">
+          <div class="ret-row">
+            <span class="ret-lbl">25%</span>
+            <div class="ret-track"><div class="ret-fill r25" style="width:41.3%"></div></div>
+            <span class="ret-ct">1.080</span>
+          </div>
+          <div class="ret-row">
+            <span class="ret-lbl">50%</span>
+            <div class="ret-track"><div class="ret-fill r50" style="width:21.0%"></div></div>
+            <span class="ret-ct">549</span>
+          </div>
+          <div class="ret-row">
+            <span class="ret-lbl">75%</span>
+            <div class="ret-track"><div class="ret-fill r75" style="width:12.7%"></div></div>
+            <span class="ret-ct">333</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="ret-nm">Projeto Crescer</div>
+        <div class="ret-trio">
+          <div class="ret-row">
+            <span class="ret-lbl">25%</span>
+            <div class="ret-track"><div class="ret-fill r25" style="width:1.2%"></div></div>
+            <span class="ret-ct">30</span>
+          </div>
+          <div class="ret-row">
+            <span class="ret-lbl">50%</span>
+            <div class="ret-track"><div class="ret-fill r50" style="width:0.7%"></div></div>
+            <span class="ret-ct">18</span>
+          </div>
+          <div class="ret-row">
+            <span class="ret-lbl">75%</span>
+            <div class="ret-track"><div class="ret-fill r75" style="width:0.5%"></div></div>
+            <span class="ret-ct">12</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="ret-legend">
+      <span class="ret-leg-title">Legenda</span>
+      <span class="ret-leg-item">
+        <span class="ret-leg-dot" style="background:#1d6af5"></span>25% assistido
+      </span>
+      <span class="ret-leg-item">
+        <span class="ret-leg-dot" style="background:#74b0fa"></span>50% assistido
+      </span>
+      <span class="ret-leg-item">
+        <span class="ret-leg-dot" style="background:#c5d9fd"></span>75% assistido
+      </span>
+      <span class="ret-leg-note">* barras normalizadas pelo maior valor de 25% (2.616 — Enxovais Gratuitos)</span>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Gov 360 &nbsp;·&nbsp; Relatório gerado em 27/06/2026 &nbsp;·&nbsp; Período: 01–27 de junho de 2026 &nbsp;·&nbsp; Fonte: Meta Ads Manager
+</footer>
+
+
+<template id="__bundler_thumbnail" data-bg-color="#1d6af5">
+  <svg viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
+    <rect width="120" height="80" fill="#1d6af5"/>
+    <rect x="14" y="14" width="26" height="16" rx="3" fill="white" opacity=".9"/>
+    <rect x="47" y="14" width="26" height="16" rx="3" fill="white" opacity=".9"/>
+    <rect x="80" y="14" width="26" height="16" rx="3" fill="white" opacity=".9"/>
+    <rect x="14" y="36" width="92" height="6" rx="2" fill="white" opacity=".15"/>
+    <rect x="14" y="36" width="60" height="6" rx="2" fill="white" opacity=".5"/>
+    <rect x="14" y="46" width="92" height="6" rx="2" fill="white" opacity=".15"/>
+    <rect x="14" y="46" width="40" height="6" rx="2" fill="white" opacity=".5"/>
+    <rect x="14" y="56" width="92" height="6" rx="2" fill="white" opacity=".15"/>
+    <rect x="14" y="56" width="75" height="6" rx="2" fill="white" opacity=".5"/>
+    <text x="60" y="76" text-anchor="middle" fill="white" font-size="5" opacity=".6" font-family="sans-serif">Gov 360</text>
+  </svg>
+</template>
+<script>
+(async () => {
+  // Prepend so page-supplied @page / break rules (deck-stage's margin:0,
+  // author CSS) keep source-order precedence over the baseline.
+  const baseCss = document.createElement('style');
+  baseCss.textContent = "@media print {\n  @page { margin: 0.5cm; }\n  html, body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }\n  section, article, figure, table { break-inside: avoid; }\n  *, *::before, *::after {\n    animation-delay: -99s !important; animation-duration: .001s !important;\n    animation-iteration-count: 1 !important; animation-fill-mode: both !important;\n    animation-play-state: running !important; transition-duration: 0s !important;\n  }\n}";
+  document.head.prepend(baseCss);
+  if (document.readyState === 'loading') {
+    await new Promise((r) => document.addEventListener('DOMContentLoaded', r, { once: true }));
+  }
+  let ds = document.querySelector('deck-stage');
+  // whenDefined never resolves when nothing registers the element, so only
+  // await it when a <deck-stage> tag exists (and race a timeout regardless).
+  if (ds && !customElements.get('deck-stage')) {
+    try {
+      await Promise.race([
+        customElements.whenDefined('deck-stage'),
+        new Promise((r) => setTimeout(r, 3000)),
+      ]);
+    } catch (e) {}
+    ds = document.querySelector('deck-stage');
+  }
+  // dc-runtime assigns window.DCLogic at init and mounts into #dc-root on
+  // DOMContentLoaded; settle on that subtree so React has rendered before
+  // print(). Non-DC pages fall through to weighing body.
+  const isDc = !ds && 'DCLogic' in window;
+  const settleRoot = ds || (isDc ? document.getElementById('dc-root') : null) || document.body;
+  if (settleRoot) {
+    // Weigh only content children — skip script/style/template so inline
+    // Babel/CSS doesn't register as stable "content" before the framework
+    // has mounted anything.
+    const MEDIA = 'img,svg,canvas,video,picture,iframe,embed,object';
+    const weigh = () => {
+      let text = 0, media = 0;
+      for (const c of settleRoot.children) {
+        const t = c.tagName;
+        if (t === 'SCRIPT' || t === 'STYLE' || t === 'TEMPLATE') continue;
+        text += (c.textContent || '').trim().length;
+        media += c.querySelectorAll(MEDIA).length + (c.matches(MEDIA) ? 1 : 0);
+      }
+      return text + media * 100;
+    };
+    // "Non-zero and stable" alone is not sufficient to mean rendered: generic
+    // body can carry a static shell while async main content is pending, and
+    // #dc-root can carry the root DC's static text while child refs are still
+    // .sc-placeholder boxes. Gate generic on readyState 'complete', and never
+    // accept stability while a dc-runtime placeholder is present.
+    const isGeneric = settleRoot === document.body;
+    const deadline = Date.now() + 15000;
+    let last = -1, stable = 0;
+    while (Date.now() < deadline) {
+      const n = weigh();
+      const ready =
+        (!isGeneric || document.readyState === 'complete') &&
+        !settleRoot.querySelector('.sc-placeholder');
+      if (n > 0 && n === last && ready) { if (++stable >= 2) break; } else { stable = 0; }
+      last = n;
+      await new Promise((r) => setTimeout(r, 250));
+    }
+  }
+  try { await document.fonts.ready; } catch (e) {}
+  // Jump every animation to its end state so print() never captures a slide
+  // mid-entrance. Ordering matters: the 0s-transition style must be live
+  // BEFORE data-deck-active is set so attribute-keyed transitions don't
+  // start a (now-0s) run from the pre-active base.
+  const st = document.createElement('style');
+  st.textContent = '*,*::before,*::after{animation-delay:-99s !important;animation-duration:.001s !important;animation-iteration-count:1 !important;animation-fill-mode:both !important;animation-play-state:running !important;transition-duration:0s !important}';
+  document.head.appendChild(st);
+  for (const d of document.querySelectorAll('deck-stage')) {
+    for (const c of d.children) {
+      const t = c.tagName;
+      if (t === 'SCRIPT' || t === 'STYLE' || t === 'TEMPLATE') continue;
+      c.setAttribute('data-deck-active', '');
+    }
+  }
+  try {
+    const sweep = () => {
+      for (const a of document.getAnimations()) {
+        try { a.finish(); } catch (e) {
+          try { a.currentTime = (a.effect && a.effect.getComputedTiming().duration) || 0; a.pause(); } catch (e2) {}
+        }
+      }
+    };
+    sweep();
+    await new Promise((r) => requestAnimationFrame(r));
+    sweep();
+    await new Promise((r) => requestAnimationFrame(r));
+  } catch (e) {}
+  setTimeout(() => { try { window.print(); } catch (e) {} }, 200);
+})();
+</script>
+</body>
+</html>
